@@ -1,0 +1,206 @@
+@import "tailwindcss";
+@import "@heroui/styles";
+
+/* Drop zone animations */
+.drop-zone {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.drop-zone.drag-over {
+  transform: scale(1.02);
+  border-color: hsl(var(--heroui-primary)) !important;
+  background-color: hsl(var(--heroui-primary) / 0.1) !important;
+  box-shadow: 0 0 0 4px hsl(var(--heroui-primary) / 0.2),
+              0 10px 30px hsl(var(--heroui-primary) / 0.3);
+}
+
+.drop-zone svg {
+  transition: transform 0.3s ease;
+}
+
+.drop-zone.drag-over svg {
+  transform: translateY(-10px);
+  animation: bounce 0.6s ease infinite;
+}
+
+.drop-success {
+  animation: dropSuccess 0.6s ease-out;
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(-10px); }
+  50% { transform: translateY(-20px); }
+}
+
+@keyframes dropSuccess {
+  0% {
+    transform: scale(1.02);
+  }
+  50% {
+    transform: scale(0.98);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Add a checkmark animation on successful drop */
+.drop-success::after {
+  content: '✓';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  font-size: 4rem;
+  font-weight: bold;
+  color: hsl(var(--heroui-success));
+  animation: checkmark 0.6s ease-out forwards;
+  pointer-events: none;
+  z-index: 10;
+}
+
+@keyframes checkmark {
+  0% {
+    transform: translate(-50%, -50%) scale(0) rotate(-45deg);
+    opacity: 0;
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.2) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(0) rotate(45deg);
+    opacity: 0;
+  }
+}
+
+/* Image comparison slider */
+.image-comparison-container {
+  position: relative;
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+  overflow: hidden;
+  border-radius: 0.75rem;
+  line-height: 0;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+  cursor: ew-resize;
+  transition: box-shadow 0.3s ease, transform 0.2s ease;
+}
+
+.image-comparison-container:hover {
+  box-shadow: 0 15px 50px hsl(var(--heroui-primary) / 0.25);
+}
+
+.image-comparison-container:active {
+  transform: scale(0.995);
+}
+
+.image-comparison-container img {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 500px;
+  object-fit: contain;
+  pointer-events: none;
+  user-select: none;
+}
+
+.image-comparison-before {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  z-index: 2;
+  clip-path: inset(0 50% 0 0);
+  pointer-events: none;
+}
+
+.image-comparison-before img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.image-comparison-handle {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 4px;
+  background: linear-gradient(180deg, 
+    hsl(var(--heroui-primary) / 0.3) 0%, 
+    hsl(var(--heroui-primary) / 0.9) 20%,
+    hsl(var(--heroui-secondary)) 50%,
+    hsl(var(--heroui-primary) / 0.9) 80%,
+    hsl(var(--heroui-primary) / 0.3) 100%);
+  cursor: grab;
+  z-index: 5;
+  transform: translateX(-50%);
+  box-shadow: 0 0 20px hsl(var(--heroui-primary) / 0.6), 
+              0 0 40px hsl(var(--heroui-secondary) / 0.4),
+              inset 0 0 10px rgba(255, 255, 255, 0.3);
+  transition: width 0.3s ease, box-shadow 0.3s ease;
+}
+
+.image-comparison-handle:active {
+  cursor: grabbing;
+}
+
+.image-comparison-handle:hover {
+  width: 5px;
+  box-shadow: 0 0 30px hsl(var(--heroui-primary) / 0.8), 
+              0 0 60px hsl(var(--heroui-secondary) / 0.6),
+              inset 0 0 15px rgba(255, 255, 255, 0.5);
+}
+
+.image-comparison-handle::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 56px;
+  height: 56px;
+  background: linear-gradient(135deg, hsl(var(--heroui-primary)) 0%, hsl(var(--heroui-secondary)) 100%);
+  border: 4px solid hsl(var(--heroui-background));
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  box-shadow: 0 4px 20px hsl(var(--heroui-primary) / 0.5),
+              0 8px 40px hsl(var(--heroui-secondary) / 0.3),
+              inset 0 2px 10px rgba(255, 255, 255, 0.3);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.image-comparison-handle:hover::after {
+  transform: translate(-50%, -50%) scale(1.15);
+  box-shadow: 0 6px 28px hsl(var(--heroui-primary) / 0.7),
+              0 12px 56px hsl(var(--heroui-secondary) / 0.5),
+              inset 0 2px 15px rgba(255, 255, 255, 0.4);
+}
+
+.image-comparison-handle:active::after {
+  transform: translate(-50%, -50%) scale(1.05);
+}
+
+.image-comparison-handle::before {
+  content: '⟷';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 28px;
+  font-weight: bold;
+  color: white;
+  z-index: 1;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3),
+               0 4px 16px rgba(0, 0, 0, 0.2);
+  transition: transform 0.3s ease;
+}
+
+.image-comparison-handle:hover::before {
+  transform: translate(-50%, -50%) scale(1.1);
+}
