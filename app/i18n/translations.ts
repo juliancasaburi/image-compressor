@@ -27,6 +27,7 @@ export interface TranslationKeys {
     compression: string;
 
     // Preview
+    tryAnotherImage: string;
     preview: string;
     originalSize: string;
     compressedSize: string;
@@ -41,6 +42,10 @@ export interface TranslationKeys {
     removeImage: string;
     processing: string;
     compressDownloadZip: string;
+
+    // Bulk actions
+    startOver: string;
+    addMoreFiles: string;
 
     // Bulk results
     totalOriginal: string;
@@ -72,6 +77,7 @@ export const translations: Record<Locale, TranslationKeys> = {
         high: 'High (50%)',
         compression: 'Compression:',
 
+        tryAnotherImage: 'Try another image',
         preview: 'Preview',
         originalSize: 'Original Size',
         compressedSize: 'Compressed Size',
@@ -85,6 +91,9 @@ export const translations: Record<Locale, TranslationKeys> = {
         removeImage: 'Remove image',
         processing: 'Processing...',
         compressDownloadZip: 'Compress & Download ZIP',
+
+        startOver: 'Start over',
+        addMoreFiles: 'Add more files',
 
         totalOriginal: 'Total Original',
         totalCompressed: 'Total Compressed',
@@ -114,6 +123,7 @@ export const translations: Record<Locale, TranslationKeys> = {
         high: 'Alta (50%)',
         compression: 'Compresión:',
 
+        tryAnotherImage: 'Probar con otra imagen',
         preview: 'Vista previa',
         originalSize: 'Tamaño original',
         compressedSize: 'Tamaño comprimido',
@@ -127,6 +137,9 @@ export const translations: Record<Locale, TranslationKeys> = {
         removeImage: 'Eliminar imagen',
         processing: 'Procesando...',
         compressDownloadZip: 'Comprimir y descargar ZIP',
+
+        startOver: 'Empezar de nuevo',
+        addMoreFiles: 'Agregar más archivos',
 
         totalOriginal: 'Total original',
         totalCompressed: 'Total comprimido',

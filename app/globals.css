@@ -44,6 +44,28 @@
   }
 }
 
+/* Add-more tile: floating icon + drag state matching main drop zone */
+@keyframes float-icon {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-6px); }
+}
+
+.add-more-tile .upload-icon {
+  animation: float-icon 2.2s ease-in-out infinite;
+}
+
+.add-more-tile.drag-over .upload-icon {
+  transform: translateY(-10px);
+  animation: bounce 0.6s ease infinite;
+}
+
+/* Suppress scale/shadow on drag-over — tile lives inside overflow:auto, clipping occurs */
+.add-more-tile.drag-over {
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+
 /* Add a checkmark animation on successful drop */
 .drop-success::after {
   content: '✓';
