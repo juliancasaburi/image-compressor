@@ -306,8 +306,8 @@ export default function ImageCompressor() {
             <ThemeSwitcher />
           </div>
 
-          {/* Shared initial header – shown whenever we're on the initial screen of either mode */}
-          {((mode === 'single' && !showPreview) || mode === 'bulk') && (
+          {/* Shared header – always shown for both modes */}
+          {(mode === 'single' || mode === 'bulk') && (
             <div className="text-center mb-6">
               <h1 className="text-3xl sm:text-4xl font-bold mb-2 text-foreground">{t.appTitle}</h1>
               <p className="text-foreground-500 mb-5">{t.appSubtitle}</p>
@@ -393,29 +393,19 @@ export default function ImageCompressor() {
                         <Card variant="secondary" className="bg-default-100"><Card.Content className="text-center p-4"><p className="text-sm text-foreground-600 mb-1">{t.compressedSize}</p><p className="text-xl font-bold text-foreground">{compressedSize}</p></Card.Content></Card>
                       </div>
                       <Card variant="secondary" className="bg-success-50 dark:bg-success-100/10 border-2 border-success mb-6"><Card.Content className="text-center p-4"><p className="text-sm text-foreground-600 mb-1">{t.spaceSaved}</p><p className="text-3xl font-bold text-success">{savings}%</p></Card.Content></Card>
-                      <Button onClick={downloadCompressed} variant="primary" className="w-full bg-gradient-to-r from-primary to-secondary">{t.downloadCompressed}</Button>
+                      <Button onClick={downloadCompressed} variant="primary" className="w-full bg-gradient-to-r from-primary to-secondary flex items-center justify-center gap-2">
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                        {t.downloadCompressed}
+                      </Button>
                     </>
                   )}
                 </div>
               )}
 
-              {/* ── DESKTOP 3-COL: after upload ── */}
+              {/* ── DESKTOP 2-COL: after upload ── */}
               {showPreview && originalImageUrl && compressedImageUrl && (
-                <div className="hidden lg:grid lg:grid-cols-[220px_1fr_260px] lg:gap-6 lg:items-start">
-                  {/* Left: title + subtitle + try another */}
-                  <div className="flex flex-col gap-4 pt-1">
-                    <div>
-                      <h1 className="text-2xl font-bold mb-2 text-foreground">{t.appTitle}</h1>
-                      <p className="text-foreground-500 text-sm">{t.appSubtitle}</p>
-                    </div>
-                    <Button variant="outline" onClick={resetSingle} className="flex items-center justify-center gap-2 w-full">
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path>
-                      </svg>
-                      {t.tryAnotherImage}
-                    </Button>
-                  </div>
-                  {/* Middle: preview slider */}
+                <div className="hidden lg:grid lg:grid-cols-[1fr_260px] lg:gap-6 lg:items-start">
+                  {/* Left: preview slider */}
                   <div>
                     <h3 className="text-lg font-semibold mb-4 text-foreground">{t.preview}</h3>
                     <div className="rounded-xl overflow-hidden shadow-lg">
@@ -450,7 +440,16 @@ export default function ImageCompressor() {
                       <Card variant="secondary" className="bg-default-100"><Card.Content className="text-center p-3"><p className="text-xs text-foreground-600 mb-1">{t.compressedSize}</p><p className="text-lg font-bold text-foreground">{compressedSize}</p></Card.Content></Card>
                     </div>
                     <Card variant="secondary" className="bg-success-50 dark:bg-success-100/10 border-2 border-success mb-4"><Card.Content className="text-center p-3"><p className="text-xs text-foreground-600 mb-1">{t.spaceSaved}</p><p className="text-2xl font-bold text-success">{savings}%</p></Card.Content></Card>
-                    <Button onClick={downloadCompressed} variant="primary" className="w-full bg-gradient-to-r from-primary to-secondary">{t.downloadCompressed}</Button>
+                    <Button onClick={downloadCompressed} variant="primary" className="w-full bg-gradient-to-r from-primary to-secondary flex items-center justify-center gap-2">
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                      {t.downloadCompressed}
+                    </Button>
+                    <Button variant="outline" onClick={resetSingle} className="flex items-center justify-center gap-2 w-full mt-3">
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path>
+                      </svg>
+                      {t.tryAnotherImage}
+                    </Button>
                   </div>
                 </div>
               )}
@@ -552,7 +551,14 @@ export default function ImageCompressor() {
                       ))}
                     </div>
                   </div>
-                  <Button onClick={processBulkImages} isDisabled={bulkProcessing} variant="primary" className="w-full bg-gradient-to-r from-primary to-secondary">{bulkProcessing ? t.processing : t.compressDownloadZip}</Button>
+                  <Button onClick={processBulkImages} isDisabled={bulkProcessing} variant="primary" className="w-full bg-gradient-to-r from-primary to-secondary flex items-center justify-center gap-2">
+                    {bulkProcessing ? (
+                      <svg className="w-4 h-4 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                    ) : (
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                    )}
+                    {bulkProcessing ? t.processing : t.compressDownloadZip}
+                  </Button>
                   {bulkProcessing && (
                     <div className="mt-4"><div className="bg-default-200 rounded-full h-4 overflow-hidden"><div className="progress-bar bg-gradient-to-r from-primary to-secondary h-full flex items-center justify-center text-xs text-white font-semibold transition-all duration-300" style={{ width: `${bulkProgress}%` }}>{bulkProgress}%</div></div></div>
                   )}
@@ -566,23 +572,10 @@ export default function ImageCompressor() {
                 </div>
               )}
 
-              {/* ── Bulk DESKTOP 3-COL: after files selected ── */}
+              {/* ── Bulk DESKTOP 2-COL: after files selected ── */}
               {showBulkControls && (
-                <div className="hidden lg:grid lg:grid-cols-[220px_1fr_260px] lg:gap-6 lg:items-start">
-                  {/* Left: title + subtitle + start over */}
-                  <div className="flex flex-col gap-4 pt-1">
-                    <div>
-                      <h1 className="text-2xl font-bold mb-2 text-foreground">{t.appTitle}</h1>
-                      <p className="text-foreground-500 text-sm">{t.appSubtitle}</p>
-                    </div>
-                    <Button variant="outline" onClick={resetBulk} className="flex items-center justify-center gap-2 w-full">
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
-                      </svg>
-                      {t.startOver}
-                    </Button>
-                  </div>
-                  {/* Middle: file list + add more */}
+                <div className="hidden lg:grid lg:grid-cols-[1fr_260px] lg:gap-6 lg:items-start">
+                  {/* Left: file list + add more */}
                   <div>
                     <h4 className="font-semibold text-foreground mb-3 flex items-center gap-2">
                       {t.selectedFiles} <Chip variant="primary" className="bg-primary text-primary-foreground">{bulkImages.length}</Chip>
@@ -635,7 +628,14 @@ export default function ImageCompressor() {
                       />
                       <span className="text-foreground-600 font-medium text-sm">%</span>
                     </div>
-                    <Button onClick={processBulkImages} isDisabled={bulkProcessing} variant="primary" className="w-full bg-gradient-to-r from-primary to-secondary mb-3">{bulkProcessing ? t.processing : t.compressDownloadZip}</Button>
+                    <Button onClick={processBulkImages} isDisabled={bulkProcessing} variant="primary" className="w-full bg-gradient-to-r from-primary to-secondary mb-3 flex items-center justify-center gap-2">
+                      {bulkProcessing ? (
+                        <svg className="w-4 h-4 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                      ) : (
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                      )}
+                      {bulkProcessing ? t.processing : t.compressDownloadZip}
+                    </Button>
                     {bulkProcessing && (
                       <div className="mb-4"><div className="bg-default-200 rounded-full h-4 overflow-hidden"><div className="progress-bar bg-gradient-to-r from-primary to-secondary h-full flex items-center justify-center text-xs text-white font-semibold transition-all duration-300" style={{ width: `${bulkProgress}%` }}>{bulkProgress}%</div></div></div>
                     )}
@@ -646,6 +646,12 @@ export default function ImageCompressor() {
                         <Card variant="secondary" className="bg-secondary-50 dark:bg-secondary-100/10 border-2 border-secondary"><Card.Content className="text-center p-3"><p className="text-xs text-foreground-600 mb-1">{t.totalSaved}</p><p className="text-lg font-bold text-secondary">{formatFileSize(bulkStats.saved)}</p></Card.Content></Card>
                       </div>
                     )}
+                    <Button variant="outline" onClick={resetBulk} className="flex items-center justify-center gap-2 w-full mt-3">
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                      </svg>
+                      {t.startOver}
+                    </Button>
                   </div>
                 </div>
               )}
