@@ -1,5 +1,10 @@
+import { LanguageProvider } from "./i18n/LanguageContext";
 import ImageCompressor from "./components/ImageCompressor";
 
 export default function Home() {
-  return <ImageCompressor />;
+  return (
+    <LanguageProvider>
+      <ImageCompressor />
+    </LanguageProvider>
+  );
 }
