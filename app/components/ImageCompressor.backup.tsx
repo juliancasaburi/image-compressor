@@ -285,7 +285,7 @@ export default function ImageCompressor() {
           <h1 className="text-3xl sm:text-4xl font-bold text-center mb-2 bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">
             Image Compressor
           </h1>
-          <p className="text-center text-gray-600 mb-6">Reduce image size while maintaining quality</p>
+          <p className="text-center text-gray-600 mb-6">Reduce image size</p>
 
           {/* Mode Toggle */}
           <div className="flex gap-3 mb-6 justify-center">
