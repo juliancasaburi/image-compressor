@@ -6,6 +6,8 @@ import { ReactCompareSlider } from 'react-compare-slider';
 import NextLink from "next/link";
 import JSZip from 'jszip';
 import ThemeSwitcher from './ThemeSwitcher';
+import LanguageSwitcher from './LanguageSwitcher';
+import { useTranslation } from '../i18n/LanguageContext';
 
 export default function ImageCompressor() {
   const [mode, setMode] = useState<'single' | 'bulk'>('single');
@@ -35,15 +37,7 @@ export default function ImageCompressor() {
   const dropZoneRef = useRef<HTMLDivElement>(null);
   const bulkDropZoneRef = useRef<HTMLDivElement>(null);
   const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
-
-  // Debounce function
-  const debounce = <T extends (...args: any[]) => void>(func: T, delay: number) => {
-    let timeoutId: NodeJS.Timeout;
-    return (...args: Parameters<T>) => {
-      clearTimeout(timeoutId);
-      timeoutId = setTimeout(() => func(...args), delay);
-    };
-  };
+  const { t } = useTranslation();
 
   // Format file size
   const formatFileSize = (bytes: number): string => {
@@ -64,7 +58,7 @@ export default function ImageCompressor() {
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
         </svg>
         <div class="flex-1">
-          <p class="font-semibold">Error</p>
+          <p class="font-semibold">${t.error}</p>
           <p class="text-sm mt-1 whitespace-pre-line">${message}</p>
         </div>
       </div>
@@ -107,7 +101,7 @@ export default function ImageCompressor() {
 
     if (!file.type.startsWith('image/')) {
       const extension = file.name.substring(file.name.lastIndexOf('.')) || 'unknown';
-      showError(`This file extension is not allowed:\n"${file.name}"\n\nPlease upload an image file (JPG, PNG, WebP)`);
+      showError(`${t.fileNotAllowed}\n"${file.name}"\n\n${t.fileNotAllowedHint}`);
       if (fileInputRef.current) fileInputRef.current.value = '';
       return;
     }
@@ -173,12 +167,12 @@ export default function ImageCompressor() {
   // Handle compression change (updates slider value immediately, compresses after delay)
   const handleCompressionChange = useCallback((value: number, immediate = false) => {
     setCompression(value);
-    
+
     // Clear existing timer
     if (debounceTimerRef.current) {
       clearTimeout(debounceTimerRef.current);
     }
-    
+
     // If immediate is true (e.g., preset button click), compress right away
     if (immediate) {
       performCompression(value);
@@ -211,8 +205,7 @@ export default function ImageCompressor() {
 
     if (rejectedFiles.length > 0) {
       const rejectedList = rejectedFiles.map(f => `• ${f.name}`).join('\n');
-      const plural = rejectedFiles.length === 1 ? 'file extension is' : 'file extensions are';
-      showError(`${rejectedFiles.length} ${plural} not allowed:\n\n${rejectedList}\n\nOnly image files (JPG, PNG, WebP) are supported.`);
+      showError(`${t.filesNotAllowed(rejectedFiles.length)}\n\n${rejectedList}\n\n${t.onlyImagesSupported}`);
     }
 
     if (imageFiles.length > 0) {
@@ -277,16 +270,18 @@ export default function ImageCompressor() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary-100 to-secondary-100 dark:from-primary-900 dark:to-secondary-900 p-4 sm:p-8">
-      {/* Header with Theme Switcher */}
-      <div className="fixed top-4 right-4 z-50 flex items-center gap-3">
-        <ThemeSwitcher />
-      </div>
       <div className="max-w-4xl mx-auto">
         <Card className="p-6 sm:p-8 mb-6">
+          {/* Toolbar row */}
+          <div className="flex items-center justify-end gap-2 mb-6">
+            <LanguageSwitcher />
+            <ThemeSwitcher />
+          </div>
+
           <h1 className="text-3xl sm:text-4xl font-bold text-center mb-2 text-foreground">
-            Image Compressor
+            {t.appTitle}
           </h1>
-          <p className="text-center text-foreground-500 mb-6">Reduce image size while maintaining quality</p>
+          <p className="text-center text-foreground-500 mb-6">{t.appSubtitle}</p>
 
           {/* Mode Toggle */}
           <div className="flex gap-3 mb-6 justify-center">
@@ -294,13 +289,13 @@ export default function ImageCompressor() {
               onClick={() => setMode('single')}
               variant={mode === 'single' ? 'primary' : 'outline'}
             >
-              Single Image
+              {t.singleImage}
             </Button>
             <Button
               onClick={() => setMode('bulk')}
               variant={mode === 'bulk' ? 'primary' : 'outline'}
             >
-              Bulk Process
+              {t.bulkProcess}
             </Button>
           </div>
 
@@ -311,11 +306,10 @@ export default function ImageCompressor() {
               <Card
                 ref={dropZoneRef}
                 variant="secondary"
-                className={`drop-zone border-2 border-dashed transition-all cursor-pointer mb-6 ${
-                  justDropped 
-                    ? 'drop-success border-success bg-success-50 dark:bg-success-100/10' 
+                className={`drop-zone border-2 border-dashed transition-all cursor-pointer mb-6 ${justDropped
+                    ? 'drop-success border-success bg-success-50 dark:bg-success-100/10'
                     : 'border-default-300 hover:border-primary hover:bg-default-100'
-                }`}
+                  }`}
                 onClick={() => fileInputRef.current?.click()}
                 onDragOver={(e) => {
                   e.preventDefault();
@@ -344,44 +338,44 @@ export default function ImageCompressor() {
                   <svg className="w-16 h-16 mx-auto mb-4 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
                   </svg>
-                  <p className="text-lg font-semibold text-foreground mb-2">Drop image here or click to upload</p>
-                  <p className="text-sm text-foreground-500">Supports: JPG, PNG, WebP (converts to JPG)</p>
+                  <p className="text-lg font-semibold text-foreground mb-2">{t.dropTitle}</p>
+                  <p className="text-sm text-foreground-500">{t.dropSubtitle}</p>
                 </Card.Content>
               </Card>
 
               {/* Quality Controls */}
               {showControls && (
                 <div className="mb-6">
-                  <h3 className="text-lg font-semibold mb-4 text-foreground">Compression Settings</h3>
+                  <h3 className="text-lg font-semibold mb-4 text-foreground">{t.compressionSettings}</h3>
 
                   {/* Presets */}
                   <div className="flex flex-wrap gap-3 mb-4">
-                    <Button 
-                      onClick={() => handleCompressionChange(10, true)} 
+                    <Button
+                      onClick={() => handleCompressionChange(10, true)}
                       variant="primary"
                       className="bg-warning"
                     >
-                      Low (10%)
+                      {t.low}
                     </Button>
-                    <Button 
-                      onClick={() => handleCompressionChange(30, true)} 
+                    <Button
+                      onClick={() => handleCompressionChange(30, true)}
                       variant="primary"
                       className="bg-primary"
                     >
-                      Medium (30%)
+                      {t.medium}
                     </Button>
-                    <Button 
-                      onClick={() => handleCompressionChange(50, true)} 
+                    <Button
+                      onClick={() => handleCompressionChange(50, true)}
                       variant="primary"
                       className="bg-success"
                     >
-                      High (50%)
+                      {t.high}
                     </Button>
                   </div>
 
                   {/* Slider */}
                   <div className="flex items-center gap-4">
-                    <label className="text-foreground font-medium min-w-fit">Compression:</label>
+                    <label className="text-foreground font-medium min-w-fit">{t.compression}</label>
                     <Slider
                       minValue={0}
                       maxValue={100}
@@ -420,24 +414,24 @@ export default function ImageCompressor() {
               {/* Preview Section */}
               {showPreview && originalImageUrl && compressedImageUrl && (
                 <div>
-                  <h3 className="text-lg font-semibold mb-4 text-foreground">Preview</h3>
+                  <h3 className="text-lg font-semibold mb-4 text-foreground">{t.preview}</h3>
 
                   {/* Image Comparison Slider */}
                   <div className="mb-4 max-w-[800px] mx-auto rounded-xl overflow-hidden shadow-lg">
                     <ReactCompareSlider
                       itemOne={
-                        <div style={{ 
-                          display: 'flex', 
-                          alignItems: 'center', 
+                        <div style={{
+                          display: 'flex',
+                          alignItems: 'center',
                           justifyContent: 'center',
                           width: '100%',
                           height: '100%',
                           overflow: 'hidden'
                         }}>
-                          <img 
-                            src={originalImageUrl} 
+                          <img
+                            src={originalImageUrl}
                             alt="Original"
-                            style={{ 
+                            style={{
                               width: '100%',
                               height: '100%',
                               objectFit: 'contain',
@@ -447,18 +441,18 @@ export default function ImageCompressor() {
                         </div>
                       }
                       itemTwo={
-                        <div style={{ 
-                          display: 'flex', 
-                          alignItems: 'center', 
+                        <div style={{
+                          display: 'flex',
+                          alignItems: 'center',
                           justifyContent: 'center',
                           width: '100%',
                           height: '100%',
                           overflow: 'hidden'
                         }}>
-                          <img 
-                            src={compressedImageUrl} 
+                          <img
+                            src={compressedImageUrl}
                             alt="Compressed"
-                            style={{ 
+                            style={{
                               width: '100%',
                               height: '100%',
                               objectFit: 'contain',
@@ -468,7 +462,7 @@ export default function ImageCompressor() {
                         </div>
                       }
                       position={50}
-                      style={{ 
+                      style={{
                         display: 'flex',
                         width: '100%',
                         height: 'auto',
@@ -481,13 +475,13 @@ export default function ImageCompressor() {
                   <div className="grid grid-cols-2 gap-4 mb-6">
                     <Card variant="secondary" className="bg-default-100">
                       <Card.Content className="text-center p-4">
-                        <p className="text-sm text-foreground-600 mb-1">Original Size</p>
+                        <p className="text-sm text-foreground-600 mb-1">{t.originalSize}</p>
                         <p className="text-xl font-bold text-foreground">{originalSize}</p>
                       </Card.Content>
                     </Card>
                     <Card variant="secondary" className="bg-default-100">
                       <Card.Content className="text-center p-4">
-                        <p className="text-sm text-foreground-600 mb-1">Compressed Size</p>
+                        <p className="text-sm text-foreground-600 mb-1">{t.compressedSize}</p>
                         <p className="text-xl font-bold text-foreground">{compressedSize}</p>
                       </Card.Content>
                     </Card>
@@ -496,7 +490,7 @@ export default function ImageCompressor() {
                   {/* Savings */}
                   <Card variant="secondary" className="bg-success-50 dark:bg-success-100/10 border-2 border-success mb-6">
                     <Card.Content className="text-center p-4">
-                      <p className="text-sm text-foreground-600 mb-1">Space Saved</p>
+                      <p className="text-sm text-foreground-600 mb-1">{t.spaceSaved}</p>
                       <p className="text-3xl font-bold text-success">{savings}%</p>
                     </Card.Content>
                   </Card>
@@ -507,7 +501,7 @@ export default function ImageCompressor() {
                     variant="primary"
                     className="w-full bg-gradient-to-r from-primary to-secondary"
                   >
-                    Download Compressed Image
+                    {t.downloadCompressed}
                   </Button>
                 </div>
               )}
@@ -521,11 +515,10 @@ export default function ImageCompressor() {
               <Card
                 ref={bulkDropZoneRef}
                 variant="secondary"
-                className={`drop-zone border-2 border-dashed transition-all cursor-pointer mb-6 ${
-                  bulkJustDropped 
-                    ? 'drop-success border-success bg-success-50 dark:bg-success-100/10' 
+                className={`drop-zone border-2 border-dashed transition-all cursor-pointer mb-6 ${bulkJustDropped
+                    ? 'drop-success border-success bg-success-50 dark:bg-success-100/10'
                     : 'border-default-300 hover:border-primary hover:bg-default-100'
-                }`}
+                  }`}
                 onClick={() => bulkFileInputRef.current?.click()}
                 onDragOver={(e) => {
                   e.preventDefault();
@@ -555,44 +548,44 @@ export default function ImageCompressor() {
                   <svg className="w-16 h-16 mx-auto mb-4 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
                   </svg>
-                  <p className="text-lg font-semibold text-foreground mb-2">Drop multiple images here or click to upload</p>
-                  <p className="text-sm text-foreground-500">Supports: JPG, PNG, WebP (converts to JPG)</p>
+                  <p className="text-lg font-semibold text-foreground mb-2">{t.bulkDropTitle}</p>
+                  <p className="text-sm text-foreground-500">{t.bulkDropSubtitle}</p>
                 </Card.Content>
               </Card>
 
               {/* Bulk Controls */}
               {showBulkControls && (
                 <div className="mb-6">
-                  <h3 className="text-lg font-semibold mb-4 text-foreground">Compression Settings (Applied to All)</h3>
+                  <h3 className="text-lg font-semibold mb-4 text-foreground">{t.bulkCompressionSettings}</h3>
 
                   {/* Presets */}
                   <div className="flex flex-wrap gap-3 mb-4">
-                    <Button 
-                      onClick={() => setCompression(10)} 
+                    <Button
+                      onClick={() => setCompression(10)}
                       variant="primary"
                       className="bg-warning"
                     >
-                      Low (10%)
+                      {t.low}
                     </Button>
-                    <Button 
-                      onClick={() => setCompression(30)} 
+                    <Button
+                      onClick={() => setCompression(30)}
                       variant="primary"
                       className="bg-primary"
                     >
-                      Medium (30%)
+                      {t.medium}
                     </Button>
-                    <Button 
-                      onClick={() => setCompression(50)} 
+                    <Button
+                      onClick={() => setCompression(50)}
                       variant="primary"
                       className="bg-success"
                     >
-                      High (50%)
+                      {t.high}
                     </Button>
                   </div>
 
                   {/* Slider */}
                   <div className="flex items-center gap-4 mb-4">
-                    <label className="text-foreground font-medium min-w-fit">Compression:</label>
+                    <label className="text-foreground font-medium min-w-fit">{t.compression}</label>
                     <Slider
                       minValue={0}
                       maxValue={100}
@@ -629,7 +622,7 @@ export default function ImageCompressor() {
                   {/* Files List with Previews */}
                   <div className="mb-6">
                     <h4 className="font-semibold text-foreground mb-3 flex items-center gap-2">
-                      Selected Files: <Chip variant="primary" className="bg-primary text-primary-foreground">{bulkImages.length}</Chip>
+                      {t.selectedFiles} <Chip variant="primary" className="bg-primary text-primary-foreground">{bulkImages.length}</Chip>
                     </h4>
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 max-h-96 overflow-y-auto">
                       {bulkImages.map((file, index) => (
@@ -655,7 +648,7 @@ export default function ImageCompressor() {
                                   }
                                 }}
                                 className="absolute top-2 right-2 bg-danger text-white rounded-full p-1.5 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-danger-600"
-                                title="Remove image"
+                                title={t.removeImage}
                               >
                                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path>
@@ -683,7 +676,7 @@ export default function ImageCompressor() {
                     variant="primary"
                     className="w-full bg-gradient-to-r from-primary to-secondary"
                   >
-                    {bulkProcessing ? 'Processing...' : 'Compress & Download ZIP'}
+                    {bulkProcessing ? t.processing : t.compressDownloadZip}
                   </Button>
 
                   {/* Progress Bar */}
@@ -707,19 +700,19 @@ export default function ImageCompressor() {
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
                   <Card variant="secondary" className="bg-primary-50 dark:bg-primary-100/10 border-2 border-primary">
                     <Card.Content className="text-center p-4">
-                      <p className="text-sm text-foreground-600 mb-1">Total Original</p>
+                      <p className="text-sm text-foreground-600 mb-1">{t.totalOriginal}</p>
                       <p className="text-xl font-bold text-primary">{formatFileSize(bulkStats.original)}</p>
                     </Card.Content>
                   </Card>
                   <Card variant="secondary" className="bg-success-50 dark:bg-success-100/10 border-2 border-success">
                     <Card.Content className="text-center p-4">
-                      <p className="text-sm text-foreground-600 mb-1">Total Compressed</p>
+                      <p className="text-sm text-foreground-600 mb-1">{t.totalCompressed}</p>
                       <p className="text-xl font-bold text-success">{formatFileSize(bulkStats.compressed)}</p>
                     </Card.Content>
                   </Card>
                   <Card variant="secondary" className="bg-secondary-50 dark:bg-secondary-100/10 border-2 border-secondary">
                     <Card.Content className="text-center p-4">
-                      <p className="text-sm text-foreground-600 mb-1">Total Saved</p>
+                      <p className="text-sm text-foreground-600 mb-1">{t.totalSaved}</p>
                       <p className="text-xl font-bold text-secondary">{formatFileSize(bulkStats.saved)}</p>
                     </Card.Content>
                   </Card>
@@ -732,7 +725,7 @@ export default function ImageCompressor() {
         {/* Footer */}
         <div className="text-center mt-8 space-y-3">
           <p className="text-foreground-500 dark:text-foreground-400 text-sm">
-            All processing happens in your browser. No files are uploaded to any server.
+            {t.privacyNotice}
           </p>
           <Link
             href="https://github.com/juliancasaburi/image-compressor"
@@ -741,21 +734,21 @@ export default function ImageCompressor() {
               variant="ghost"
               className="bg-default-100 dark:bg-default-50 text-foreground-600 hover:text-primary gap-2"
             >
-            <svg
-              className="w-5 h-5"
-              fill="currentColor"
-              viewBox="0 0 24 24"
-              aria-hidden="true"
-            >
-            <path
-              fillRule="evenodd"
-              d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"
-              clipRule="evenodd"
-            />
-          </svg>
-            View source on GitHub
-          </Button>
-        </Link>
+              <svg
+                className="w-5 h-5"
+                fill="currentColor"
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"
+                  clipRule="evenodd"
+                />
+              </svg>
+              {t.viewSource}
+            </Button>
+          </Link>
         </div>
       </div>
     </div>
