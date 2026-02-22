@@ -56,7 +56,7 @@ export interface TranslationKeys {
 export const translations: Record<Locale, TranslationKeys> = {
     en: {
         appTitle: 'Image Compressor',
-        appSubtitle: 'Reduce image size while maintaining quality',
+        appSubtitle: 'Reduce image size',
         privacyNotice: 'All processing happens in your browser. No files are uploaded to any server.',
         viewSource: 'View source on GitHub',
 
